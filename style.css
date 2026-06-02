@@ -1,0 +1,673 @@
+/* ==========================================================================
+   1. RESET & VARIABLE PALETTE SETUP
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-cream: #faf7f0;
+    --soft-gold: #e6c667;
+    --deep-gold: #bfa043;
+    --light-yellow: #fff9e6;
+    --text-dark: #3a3833;
+    --text-muted: #7d796e;
+    --transition-speed: 1.2s;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+    position: relative;
+}
+
+/* Canvas overlay layering */
+#ambient-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ==========================================================================
+   2. APP SCREEN SPA ENGINE TRANSITIONS
+   ========================================================================== */
+.app-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.02) translateY(5px);
+    transition: opacity var(--transition-speed) ease-in-out, 
+                transform var(--transition-speed) ease-in-out;
+    z-index: 1;
+    padding: 20px;
+    background-color: var(--bg-cream);
+}
+
+.app-screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+    z-index: 2;
+}
+
+.screen-content {
+    max-width: 1200px;
+    width: 100%;
+    z-index: 10;
+    position: relative;
+}
+
+.center-align {
+    text-align: center;
+}
+
+.column-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+/* ==========================================================================
+   3. PERSISTENT AUDIO UI DESIGN
+   ========================================================================== */
+.music-btn {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--soft-gold);
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--deep-gold);
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(230, 198, 103, 0.15);
+    transition: all 0.3s ease;
+}
+
+.music-btn:hover {
+    background: var(--light-yellow);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   4. CASABLANCA LILY SVG VECTOR ARTISTRY & ANIMATIONS
+   ========================================================================== */
+.lily-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.lily-svg .stem {
+    stroke: #879469;
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: growStem 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.lily-svg .petal-leaf {
+    fill: #fffdf2;
+    stroke: #f7e7ad;
+    stroke-width: 0.5;
+    transform-origin: 50px 40px;
+    transform: scale(0);
+    transition: transform 4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.lily-svg .p1, .lily-svg .p2 { fill: #fffbeb; }
+.lily-svg .p3, .lily-svg .p4 { fill: #fffde6; }
+.lily-svg .p5, .lily-svg .p6 { fill: #fffae0; }
+
+.lily-svg .pistil {
+    fill: var(--deep-gold);
+    opacity: 0;
+    transition: opacity 2s ease 2.5s;
+}
+
+.active .lily-svg .petal-leaf {
+    transform: scale(1);
+}
+
+.active .lily-svg .pistil {
+    opacity: 1;
+}
+
+@keyframes growStem {
+    to { stroke-dashoffset: 0; }
+}
+
+.lily-bg-container {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    opacity: 0.45;
+}
+.left-bloom { left: 5%; bottom: 5%; transform: rotate(15deg); }
+
+.corner-lily {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    opacity: 0.35;
+}
+.top-left { top: -20px; left: -20px; transform: rotate(135deg); }
+.bottom-right { bottom: -20px; right: -20px; transform: rotate(-45deg); }
+
+/* ==========================================================================
+   5. PAGE 1: HERO CONTAINER TYPOGRAPHY
+   ========================================================================== */
+.hero-title {
+    font-family: 'Alex Brush', cursive;
+    font-size: 5rem;
+    color: var(--deep-gold);
+    margin-bottom: 15px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: softReveal 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+}
+
+.hero-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 200;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 50px;
+    opacity: 0;
+    animation: softReveal 2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s forwards;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid var(--soft-gold);
+    padding: 14px 35px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--deep-gold);
+    border-radius: 40px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.nav-btn:hover {
+    background: var(--soft-gold);
+    color: white;
+    box-shadow: 0 8px 25px rgba(230, 198, 103, 0.35);
+    transform: translateY(-2px);
+}
+
+@keyframes softReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   6. PAGE 2: REALISTIC HANDWRITTEN LETTER STATIONERY
+   ========================================================================== */
+.letter-paper {
+    background: #ffffff;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 50px 60px;
+    border-radius: 3px;
+    box-shadow: 0 10px 50px rgba(66, 61, 48, 0.05);
+    border-left: 1px solid rgba(230, 198, 103, 0.25);
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--soft-gold) transparent;
+}
+
+.wax-seal {
+    font-size: 2.2rem;
+    color: var(--soft-gold);
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.handwritten-text {
+    font-family: 'Alex Brush', cursive;
+    font-size: 2.1rem;
+    line-height: 1.6;
+    color: #2b2a27;
+    white-space: pre-wrap;
+    min-height: 150px;
+    margin-bottom: 30px;
+}
+
+.handwritten-text::after {
+    content: '❘';
+    color: var(--soft-gold);
+    animation: blinker 1s step-end infinite;
+}
+
+.typing-complete::after {
+    display: none;
+}
+
+.dynamic-hide {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+.dynamic-hide.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+/* ==========================================================================
+   7. NEW SECTION: SELF-DRAWING CASABLANCA BOUQUET ENGINE
+   ========================================================================== */
+.bouquet-title {
+    font-family: 'Alex Brush', cursive;
+    font-size: 3.5rem;
+    color: var(--deep-gold);
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: softReveal 1.5s ease forwards 0.5s;
+}
+
+.drawing-bouquet-container {
+    width: 320px;
+    height: 320px;
+    margin: 10px auto;
+}
+
+.drawing-bouquet-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.drawing-bouquet-svg path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+}
+
+.drawing-bouquet-svg .draw-stem {
+    stroke: #879469;
+    stroke-width: 1.5;
+}
+
+.drawing-bouquet-svg .draw-ribbon, 
+.drawing-bouquet-svg .draw-ribbon-tails {
+    stroke: var(--soft-gold);
+    stroke-width: 1.5;
+}
+
+.drawing-bouquet-svg .draw-petal {
+    stroke: #bfa043;
+    stroke-width: 1;
+    fill: rgba(255, 253, 242, 0);
+    transition: fill 2s ease 3s;
+}
+
+.drawing-bouquet-svg .draw-center {
+    fill: var(--deep-gold);
+    opacity: 0;
+    transition: opacity 1.5s ease 2.8s;
+}
+
+.bouquet-message {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text-muted);
+    max-width: 80%;
+    margin: 0 auto;
+    opacity: 0;
+    animation: softReveal 1.5s ease forwards 3.5s;
+}
+
+.start-drawing .draw-stem.s1 { animation: drawLine 2s ease forwards 0.2s; }
+.start-drawing .draw-stem.s2 { animation: drawLine 2s ease forwards 0.4s; }
+.start-drawing .draw-stem.s3 { animation: drawLine 2s ease forwards 0s; }
+
+.start-drawing .draw-ribbon { animation: drawLine 1.8s ease forwards 1.2s; }
+.start-drawing .draw-ribbon-tails { animation: drawLine 1.5s ease forwards 1.5s; }
+
+.start-drawing .draw-petal { animation: drawLine 3s ease forwards 1.8s; fill: rgba(255, 253, 242, 0.95); }
+.start-drawing .draw-center { opacity: 1; }
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ==========================================================================
+   8. PAGE 4: EMOTIONAL TIMELINE & BOUQUET ASSEMBLAGE
+   ========================================================================== */
+.timeline-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.timeline-item {
+    flex: 1;
+    max-width: 220px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.timeline-item.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.timeline-item:nth-child(1) { transition-delay: 0.2s; }
+.timeline-item:nth-child(2) { transition-delay: 1.2s; }
+.timeline-item:nth-child(3) { transition-delay: 2.2s; }
+.timeline-item:nth-child(4) { transition-delay: 3.2s; }
+
+.photo-frame {
+    background: white;
+    padding: 12px 12px 25px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid #f2edd9;
+    transform: rotate(var(--rotation, -2deg));
+    margin-bottom: 15px;
+}
+
+.timeline-item:nth-child(even) .photo-frame {
+    --rotation: 3deg;
+}
+
+.photo-placeholder {
+    background: var(--light-yellow);
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    color: var(--soft-gold);
+    border-radius: 2px;
+}
+
+.memory-caption {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--text-dark);
+}
+
+.bouquet-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-top: 20px;
+}
+
+.bouquet-lily {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    bottom: 0;
+    transform-origin: bottom center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: transform 3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 2.5s ease;
+}
+
+.page-memories-active .bouquet-lily {
+    opacity: 1;
+    transform: scale(1) rotate(var(--rot));
+}
+
+.b1 { --rot: -25deg; left: -30px; transition-delay: 4s; }
+.b2 { --rot: 25deg; right: -30px; transition-delay: 4.5s; }
+.b3 { --rot: 0deg; left: 35px; transition-delay: 5s; }
+
+/* ==========================================================================
+   9. PAGE 5: MOONLIT GARDEN SCENARIO & FINAL TEXT ACCENTS
+   ========================================================================== */
+.moonlit-garden {
+    background: linear-gradient(to bottom, #fffcf5 0%, #ece5cd 100%) !important;
+}
+
+.moon-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,249,214,0.3) 0%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.emotional-sequence {
+    margin-bottom: 40px;
+    min-height: 80px;
+    position: relative;
+    width: 100%;
+}
+
+.seq-line {
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+.seq-line.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.seq-line.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.giant-lily {
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.giant-lily.bloom {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.lily-gif-asset {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 10px 20px rgba(230, 198, 103, 0.2));
+}
+
+.glowing-gold-text {
+    font-family: 'Alex Brush', cursive;
+    font-size: 3.8rem;
+    color: #c9a432;
+    line-height: 1.3;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 2.5s ease 1s, transform 2.5s ease 1s;
+}
+
+.glowing-gold-text.display-final {
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow: 0 0 25px rgba(255, 238, 173, 0.8), 0 0 50px rgba(230, 198, 103, 0.4);
+}
+
+.garden-bed {
+    position: absolute;
+    width: 100%;
+    bottom: -30px;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10%;
+    z-index: 3;
+}
+
+.garden-lily {
+    width: 160px;
+    height: 160px;
+    opacity: 0.25;
+    transform: scale(0.8);
+}
+
+/* ==========================================================================
+   10. MOBILE RESPONSIVE ADAPTATIONS
+   ========================================================================== */
+@media (max-width: 768px) {
+    .app-screen {
+        padding: 15px;
+    }
+
+    .hero-title {
+        font-size: 3.2rem !important;
+        padding: 0 10px;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.85rem !important;
+        letter-spacing: 3px !important;
+    }
+
+    .bouquet-title {
+        font-size: 2.1rem !important;
+        line-height: 1.3;
+        padding: 0 10px;
+    }
+
+    .lily-bg-container {
+        width: 180px !important;
+        height: 180px !important;
+        opacity: 0.25 !important;
+    }
+    
+    .corner-lily {
+        width: 110px !important;
+        height: 110px !important;
+        opacity: 0.2 !important;
+    }
+
+    .letter-paper {
+        padding: 30px 20px !important;
+        max-height: 75vh !important;
+        width: 95% !important;
+        margin: 0 auto;
+    }
+
+    .handwritten-text {
+        font-size: 1.45rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .music-btn {
+        top: 15px !important;
+        right: 15px !important;
+        padding: 8px 14px !important;
+        font-size: 0.65rem !important;
+    }
+    
+    .column-layout {
+        gap: 20px !important;
+    }
+    
+    .drawing-bouquet-container {
+        width: 220px !important;
+        height: 220px !important;
+        margin: 5px auto !important;
+    }
+
+    .bouquet-message {
+        font-size: 1rem !important;
+        max-width: 95% !important;
+        padding: 0 5px;
+        line-height: 1.4;
+    }
+
+    .timeline-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 25px !important;
+        overflow-y: auto;
+        max-height: 55vh;
+        padding: 10px;
+        width: 100%;
+    }
+    
+    .timeline-item {
+        max-width: 280px !important;
+        width: 100% !important;
+    }
+
+    .seq-line {
+        font-size: 1.4rem !important;
+    }
+
+    .glowing-gold-text {
+        font-size: 2.5rem !important;
+    }
+
+    .giant-lily {
+        width: 200px !important;
+        height: 200px !important;
+    }
+}
